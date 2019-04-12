@@ -8,7 +8,6 @@
 <br />
 
 <div>
-    <button onclick="GetDataPoints()">Click me</button>
     @Html.DropDownList("city", new SelectList(ViewBag.Cities, "City", "City", "Ciudad Obregon"), new { @onchange = "RefreshPartial()" })
     @Html.DropDownList("ScaleUnit", new SelectList(ViewBag.ScaleUnit, "Value", "Name", "M"), new { @onchange = "RefreshPartial()" })
 </div>
