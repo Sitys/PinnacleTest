@@ -1,0 +1,48 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+<br />
+<br />
+<br />
+
+<div>
+    <button onclick="GetDataPoints()">Click me</button>
+    @Html.DropDownList("city", new SelectList(ViewBag.Cities, "City", "City", "Ciudad Obregon"), new { @onchange = "RefreshPartial()" })
+    @Html.DropDownList("ScaleUnit", new SelectList(ViewBag.ScaleUnit, "Value", "Name", "M"), new { @onchange = "RefreshPartial()" })
+</div>
+
+<br />
+<br />
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<div id="divPartial">
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        RefreshPartial();
+    });
+
+    function RefreshPartial() {
+        $("#divPartial").html('');
+        var city = $("#city").val();
+        var scaleUnit = $("#ScaleUnit").val();
+        var url = '@Url.Action("GetGraphic","Home")';
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: { city: city, scaleUnit: scaleUnit },
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (data) {
+                $("#divPartial").html(data);
+            },
+            error: function () {
+                alert('Error');
+            }
+        });
+        }
+</script>

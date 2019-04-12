@@ -1,0 +1,143 @@
+﻿@{
+    Layout = null;
+    int countItem = 0;
+}
+
+<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+
+<table>
+    <tr>
+        <th>Day</th>
+        <th>Date(yyyy-MM-dd)</th>
+        <th>Min Temp</th>
+        <th>Current Temp</th>
+        <th>Max temp</th>
+
+    </tr>
+    @foreach (var item in ViewBag.WeatherList)
+    {
+
+        <tr>
+            <td>@(countItem += 1)</td>
+            <td>@item.DateValue</td>
+            <td>@item.MinTempValue</td>
+            <td>@item.CurrentTemp</td>
+            <td>@item.MaxTempValue</td>
+
+        </tr>
+    }
+</table>
+
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+
+
+
+    $(document).ready(function () {
+        var obj = GetDataPoints();
+       
+        var chart = new CanvasJS.Chart("chartContainer", {
+            theme: "light2",
+            animationEnabled: true,
+            title: {
+                text: "Weather Dashboard"
+            },
+            subtitles: [
+                { text: "Blue(min temp) Green(current Temp) Red(max temp)" }
+            ],
+            data: [
+                {
+                    //Blue
+                    type: "line", //change type to bar, line, area, pie, etc
+                    dataPoints: obj.MinTempString
+                },
+                {
+                    //Green
+                    type: "line", //change type to bar, line, area, pie, etc
+                    dataPoints: obj.CurrentTempString
+                },
+                {
+                    //Red
+                    type: "line", //change type to bar, line, area, pie, etc
+                    dataPoints: obj.MaxTempString
+                }
+            ]
+        });
+        chart.render();
+    });
+
+        function storeCoordinate(xVal, yVal, array)
+        {
+        array.push({ x: xVal, y: yVal });
+        }
+
+        function GetDataPoints(){
+
+
+         var arrmintempstring = [];
+         var arrcurrenttempstring = [];
+         var arrmaxtempstring = [];
+
+        var city = $("#city").val();
+        var scaleUnit = $("#ScaleUnit").val();
+        var url = '@Url.Action("GetDataPoints", "Home")';
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: { city: city, scaleUnit: scaleUnit },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                $.each(data.MinTempList, function (i, item) {
+                    storeCoordinate(item.XAxis, item.YAxis, arrmintempstring);
+                   
+                })
+
+                $.each(data.CurrentTempList, function (i, item) {
+                    
+                    storeCoordinate(item.XAxis, item.YAxis, arrcurrenttempstring);
+                   
+                })
+
+                $.each(data.MaxTempList, function (i, item) {
+                    storeCoordinate(item.XAxis, item.YAxis, arrmaxtempstring);
+                  
+                })
+
+            },
+            error: function () {
+
+            }
+        });
+            var obj =
+            {
+                MinTempString: arrmintempstring,
+                CurrentTempString: arrcurrenttempstring,
+                MaxTempString: arrmaxtempstring
+            };
+
+            return obj;
+
+    }
+
+</script>
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
